@@ -1,6 +1,7 @@
 package ua.model;
 
 import ua.DataBase.ArticleDataBase;
+import ua.DataBase.InitDB;
 
 import java.sql.*;
 
@@ -23,8 +24,10 @@ public class Article implements ArticleDataBase {
 
 
     public static void main(String[] args) throws SQLException {
-       Article art = new Article("mom3", "Заголовокz3", "шото там про шото3");
+        InitDB.getInstance();
+       Article art = new Article("mom7", "Заголовокz7", "шото там про шото7");
         art.setDate(new Date(System.currentTimeMillis()));
+        art.setTitle("Bishburmak");
         art.addArticle();
         System.out.println(art.findId());
 
@@ -74,7 +77,7 @@ public class Article implements ArticleDataBase {
 
 
     public static Map<String, Article> getAllArticle(Connection conn) throws SQLException {
-        PreparedStatement ps = conn.prepareStatement("select  * from articles;");
+        PreparedStatement ps = InitDB.conn.prepareStatement("select  * from articles;");
         Map<String, Article> articlesMaps = new HashMap<String, Article>();
         try {
             // table of data representing a database result set,
@@ -107,8 +110,8 @@ public class Article implements ArticleDataBase {
 
     public void addArticle() throws SQLException {
         //add
-        InitDB();
-        PreparedStatement ps = conn.prepareStatement("INSERT INTO articles (author, title, text_article, date_art) VALUES(?, ?, ?, ?)");
+       // InitDB();
+        PreparedStatement ps = InitDB.conn.prepareStatement("INSERT INTO articles (author, title, text_article, date_art) VALUES(?, ?, ?, ?)");
         try {
             ps.setString(1, getAuthor());
             ps.setString(2, getTitle());
@@ -121,7 +124,7 @@ public class Article implements ArticleDataBase {
     }
 
     public void deleteArticle(Article article) throws SQLException {
-        PreparedStatement ps = conn.prepareStatement("delete  from articles where id_article =" + findId() + ";");
+        PreparedStatement ps = InitDB.conn.prepareStatement("delete  from articles where id_article =" + findId() + ";");
         ResultSet rs = ps.executeQuery();
 
         //find in db
@@ -129,7 +132,7 @@ public class Article implements ArticleDataBase {
     }
 
     public void updateArticle(Article article) throws SQLException {
-        PreparedStatement ps = conn.prepareStatement("update articles set (author, title, text_article, date_art) values (?,?,?,?)  where id_article =" + findId() + ";");
+        PreparedStatement ps = InitDB.conn.prepareStatement("update articles set (author, title, text_article, date_art) values (?,?,?,?)  where id_article =" + findId() + ";");
         try {
             ps.setString(1, getAuthor());
             ps.setString(2, getTitle());
@@ -145,7 +148,7 @@ public class Article implements ArticleDataBase {
     }
 
     public int findId() throws SQLException {
-        PreparedStatement ps = conn.prepareStatement("select id_article from articles where author like '" + getAuthor() + "';");
+        PreparedStatement ps = InitDB.conn.prepareStatement("select id_article from articles where author like '" + getAuthor() + "';");
 
         ResultSet rs = ps.executeQuery();
 
@@ -157,14 +160,14 @@ public class Article implements ArticleDataBase {
 
     }
 
-    private void InitDB() {
-        try {
-            conn = DriverManager.getConnection(DB_CONNECTION, DB_USER, DB_PASSWORD);
-            st = conn.createStatement();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+//    private void InitDB() {
+//        try {
+//            conn = DriverManager.getConnection(DB_CONNECTION, DB_USER, DB_PASSWORD);
+//            st = conn.createStatement();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }
 
 

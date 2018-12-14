@@ -1,6 +1,8 @@
 package ua.model;
 
 
+import ua.DataBase.InitDB;
+
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,21 +10,16 @@ import java.util.Map;
 public class User {
     private String login;
     private String pass;
-    private boolean isAdmin ;
+    private boolean isAdmin;
     // private int userId;
-
-    static final String DB_CONNECTION = "jdbc:mysql://localhost:3306/forum?serverTimezone=Europe/Kiev";
-    static final String DB_USER = "root";
-    static final String DB_PASSWORD = "toor";
-
-    static Statement st = null;
-    public static Connection conn = null;
 
     public User(String login, String pass, boolean isAdmin) {
         this.login = login;
         this.pass = pass;
         this.isAdmin = isAdmin;
+    }
 
+    public User() {
     }
 
     public String getLogin() {
@@ -49,17 +46,20 @@ public class User {
         this.isAdmin = isAdmin;
     }
 
-//    public static void main(String[] args) throws SQLException {
-//        User us = new User("admin", "admin", true);
-//        //us.addNewUser();
-//        System.out.println(us.findUserId());
-//
-//    }
+    public int findUserId() throws SQLException {
+        PreparedStatement ps = InitDB.conn.prepareStatement("select id_users from users where login like '" + this.getLogin() + "';");
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            return rs.getInt(1);
+        }
+        return -1;
+    }
 
+
+    PreparedStatement ps;
 
     public Map<String, User> getAllUsers() throws SQLException {
-        InitDB();
-        PreparedStatement ps = conn.prepareStatement("select  * from users;");
+        PreparedStatement ps = InitDB.conn.prepareStatement("select  * from users;");
         Map<String, User> users = new HashMap<String, User>();
         try {
             // table of data representing a database result set,
@@ -90,63 +90,39 @@ public class User {
     }
 
     public void addNewUser() throws SQLException {
-        InitDB();
+        ps = InitDB.conn.prepareStatement("INSERT INTO users (login, pass, isAdmin) VALUES(?, ?, ?)");
+        paramToDB();
 
+    }
 
-        PreparedStatement ps = conn.prepareStatement("INSERT INTO users (login, pass, isAdmin) VALUES(?, ?, ?)");
+    public void deleteUser(int id_users) throws SQLException {
+        if (this.findUserId() != -1) {
+            PreparedStatement ps = InitDB.conn.prepareStatement("delete  from users where id_users ='" + this.findUserId() + "';");
+            ResultSet rs = ps.executeQuery();
+        }else{
+            System.out.println("бля....");
+        }
+    }
+
+    public void updateUser() throws SQLException {
+        if (this.findUserId() != -1) {
+            ps = InitDB.conn.prepareStatement("update users set login = ?, pass = ?, isAdmin = ? where id_users =" + this.findUserId() + ";");
+            paramToDB();
+        }else{
+            System.out.println("бля....");
+        }
+    }
+
+    public void paramToDB() throws SQLException {
         try {
-            ps.setString(1, getLogin());
-            ps.setString(2, getPass());
-            ps.setBoolean(3, isAdmin());
+            ps.setString(1, this.getLogin());
+            ps.setString(2, this.getPass());
+            ps.setBoolean(3, this.isAdmin());
             ps.executeUpdate(); // for INSERT, UPDATE & DELETE
         } finally {
             ps.close();
         }
-
     }
-
-    public void deleteUser(User user) throws SQLException {
-
-        PreparedStatement ps = conn.prepareStatement("delete  from users where id =" + findUserId() + ";");
-        ResultSet rs = ps.executeQuery();
-    }
-
-    public void updateUser(User user) throws SQLException {
-
-        PreparedStatement ps = conn.prepareStatement("update users set (login , pass , isAdmin) values (?,?,?)  where id =" + findUserId() + ";");
-        try {
-            ps.setString(1, getLogin());
-            ps.setString(2, getPass());
-            ps.setBoolean(3, isAdmin());
-            ps.executeUpdate(); // for INSERT, UPDATE & DELETE
-        } finally {
-            ps.close();
-        }
-
-    }
-
-    public int findUserId() throws SQLException {
-        InitDB();
-        PreparedStatement ps = conn.prepareStatement("select idusers from users where login like '" + getLogin() + "';");
-
-        ResultSet rs = ps.executeQuery();
-
-        while (rs.next()) {
-            return rs.getInt(1);
-        }
-        return -1;
-    }
-
-
-    private void InitDB() {
-        try {
-            conn = DriverManager.getConnection(DB_CONNECTION, DB_USER, DB_PASSWORD);
-            st = conn.createStatement();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
 
 
 }
