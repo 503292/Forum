@@ -1,38 +1,26 @@
 package ua.model;
 
+import ua.DataBase.InitDB;
+
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Chapter {
-    private String author;
+    private String login;
     private String title ;
-    private Date createDate;
+    private Date date;
 
-    static Statement st = null;
-    public static Connection conn = null;
+    PreparedStatement ps;
 
-    static final String DB_CONNECTION = "jdbc:mysql://localhost:3306/forum?serverTimezone=Europe/Kiev";
-    static final String DB_USER = "root";
-    static final String DB_PASSWORD = "toor";
-
-    public static void main(String[] args) throws SQLException {
-        Chapter cha = new Chapter("admin", "Заголовок");
-        cha.setCreateDate(new Date(System.currentTimeMillis()));
-        cha.addChapter(cha);
-        System.out.println(cha.findId());
-
-    }
-
-
-    public Chapter(String autor, String title) {
+    public Chapter(String login, String title) {
         this.title = title;
-        this.author = autor;
-        this.createDate = new Date(System.currentTimeMillis());;
+        this.login = login;
+        this.date = new Date(System.currentTimeMillis());;
     }
-
     public Chapter() {
     }
+
 
     public String getTitle() {
         return title;
@@ -42,26 +30,26 @@ public class Chapter {
         this.title = title;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getLogin() {
+        return login;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setLogin(String login) {
+        this.login = login;
     }
 
-    public Date getCreateDate() {
-        return createDate;
+    public Date getDate() {
+        return date;
     }
 
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
 
 
-    public static Map<String, Chapter> getAllChapters() throws SQLException {
-        PreparedStatement ps = conn.prepareStatement("select  * from articles;");
+    public Map<String, Chapter> getAllChapters() throws SQLException {
+        ps = InitDB.conn.prepareStatement("select  * from articles;");
         Map<String, Chapter> chapterMaps = new HashMap<String, Chapter>();
         try {
             // table of data representing a database result set,
@@ -92,46 +80,39 @@ public class Chapter {
         return chapterMaps;
     }
 
-    public void addChapter(Chapter chapter) throws SQLException {
-        PreparedStatement ps = conn.prepareStatement("INSERT INTO articles (author, title, date_art) VALUES(?, ?, ?)");
-        try {
-            ps.setString(1, getAuthor());
-            ps.setString(2, getTitle());
-            ps.setDate(3, getCreateDate());
-            ps.executeUpdate(); // for INSERT, UPDATE & DELETE
-        } finally {
-            ps.close();
-        }
+    public void addChapter() throws SQLException {
+        ps = InitDB.conn.prepareStatement("INSERT INTO chapters (login, title, date_chap) VALUES(?, ?, ?)");
+        paramToDB();
+    }
+
+    public void deleteChapter() throws SQLException {
+        ps = InitDB.conn.prepareStatement("delete  from chapters where id_chapters =" + findId() + ";");
+
 
     }
 
-    public void deleteChapter(Chapter chapter) throws SQLException {
-        PreparedStatement ps = conn.prepareStatement("delete  from articles where id =" + findId() + ";");
-        ResultSet rs = ps.executeQuery();
-
-    }
-
-    public void updateChapter(Chapter chapter){
+    public void updateChapter() throws SQLException {
+        ps = InitDB.conn.prepareStatement("update chapters set login = ?, title = ?, data_chap = ? where id_chapters =" + this.findId() + ";");
+        paramToDB();
 
     }
     public int findId() throws SQLException {
-        PreparedStatement ps = conn.prepareStatement("select id from article where author like '" + getAuthor() + "';");
-
+        ps = InitDB.conn.prepareStatement("select id_chapters from chapters where login like '" + getLogin() + "';");
         ResultSet rs = ps.executeQuery();
-
         while (rs.next()) {
             return rs.getInt(1);
-
         }
         return -1;
     }
 
-    private void InitDB() {
+    public void paramToDB() throws SQLException {
         try {
-            conn = DriverManager.getConnection(DB_CONNECTION, DB_USER, DB_PASSWORD);
-            st = conn.createStatement();
-        } catch (SQLException e) {
-            e.printStackTrace();
+            ps.setString(1, this.getLogin());
+            ps.setString(2, this.getTitle());
+            ps.setDate(3, this.getDate());
+            ps.executeUpdate(); // for INSERT, UPDATE & DELETE
+        } finally {
+            ps.close();
         }
     }
 }

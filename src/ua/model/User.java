@@ -1,6 +1,5 @@
 package ua.model;
 
-
 import ua.DataBase.InitDB;
 
 import java.sql.*;
@@ -8,10 +7,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class User {
+
     private String login;
     private String pass;
     private boolean isAdmin;
-    // private int userId;
+
+    PreparedStatement ps;
+
 
     public User(String login, String pass, boolean isAdmin) {
         this.login = login;
@@ -21,6 +23,7 @@ public class User {
 
     public User() {
     }
+
 
     public String getLogin() {
         return login;
@@ -46,6 +49,8 @@ public class User {
         this.isAdmin = isAdmin;
     }
 
+
+
     public int findUserId() throws SQLException {
         PreparedStatement ps = InitDB.conn.prepareStatement("select id_users from users where login like '" + this.getLogin() + "';");
         ResultSet rs = ps.executeQuery();
@@ -54,9 +59,6 @@ public class User {
         }
         return -1;
     }
-
-
-    PreparedStatement ps;
 
     public Map<String, User> getAllUsers() throws SQLException {
         PreparedStatement ps = InitDB.conn.prepareStatement("select  * from users;");

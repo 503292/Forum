@@ -50,7 +50,7 @@ public interface ArticleDataBase {
 //            //add
 //        PreparedStatement ps = conn.prepareStatement("INSERT INTO Article (author, title, textArticles) VALUES(?, ?, ?)");
 //        try {
-//            ps.setString(1, article.getAuthor());
+//            ps.setString(1, article.getLogin());
 //            ps.setString(2, article.getTitle());
 //            ps.setString(3, article.getTextArticle());
 //            ps.executeUpdate(); // for INSERT, UPDATE & DELETE
@@ -71,7 +71,7 @@ public interface ArticleDataBase {
 //    }
 //
 //    public static int findId(Article article, Connection conn) throws SQLException {
-//        PreparedStatement ps = conn.prepareStatement("select * from Article where author like '" + article.getAuthor() + "';");
+//        PreparedStatement ps = conn.prepareStatement("select * from Article where author like '" + article.getLogin() + "';");
 //
 //        ResultSet rs = ps.executeQuery();
 //
@@ -80,7 +80,7 @@ public interface ArticleDataBase {
 //        }
 //
 //
-//        // if (article.getAuthor() ==)
+//        // if (article.getLogin() ==)
 //
 //
 //        return 0;

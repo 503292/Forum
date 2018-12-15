@@ -1118,7 +1118,7 @@
     </collation>
     <table id="281" parent="2" name="articles"/>
     <table id="282" parent="2" name="users"/>
-    <column id="283" parent="281" name="id_article">
+    <column id="283" parent="281" name="id_articles">
       <Position>1</Position>
       <DataType>int(11)|0s</DataType>
       <NotNull>1</NotNull>
@@ -1152,7 +1152,7 @@
     </index>
     <key id="289" parent="281" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
-      <ColNames>id_article</ColNames>
+      <ColNames>id_articles</ColNames>
       <Primary>1</Primary>
     </key>
     <key id="290" parent="281" name="author_UNIQUE">
